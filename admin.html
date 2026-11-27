@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f172a">
+<title>MAKAM - لوحة التحكم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="admin">
+<!-- Admin Login -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <span class="icon">🔐</span><h2>لوحة التحكم</h2><p>أدخل البريد وكلمة المرور</p>
+    <input type="email" id="adminEmailInput" placeholder="البريد الإلكتروني" style="text-align:left; direction:ltr;">
+    <input type="password" id="adminPasswordInput" placeholder="كلمة المرور" onkeypress="if(event.key==='Enter')doLogin()" style="text-align:left; direction:ltr;">
+    <button type="button" onclick="doLogin()">دخول</button><div class="error" id="loginError"></div><button type="button" class="back" onclick="cancelLogin()">← العودة للمتجر</button>
+  </div>
+</div>
+
+<!-- Admin Panel -->
+<div class="admin-panel" id="adminPanel">
+  <div class="admin-header">
+    <h1>⚙️ إدارة المتجر MAKAM</h1>
+    <button type="button" class="admin-close" onclick="closeAdmin()">✕ إغلاق</button>
+  </div>
+  <div class="admin-tabs">
+    <button type="button" class="admin-tab active" onclick="showAdminTab('products',this)">📦 المنتجات</button>
+    <button type="button" class="admin-tab" onclick="showAdminTab('orders',this)">📋 الطلبات <span id="ordersBadge"></span></button>
+    <button type="button" class="admin-tab" onclick="showAdminTab('messages',this)">💬 الرسائل <span id="messagesBadge"></span></button>
+    <button type="button" class="admin-tab" onclick="showAdminTab('add',this)">➕ إضافة</button>
+    <button type="button" class="admin-tab" onclick="showAdminTab('settings',this)">⚙️ الإعدادات</button>
+  </div>
+  <div class="admin-content">
+
+    <div class="admin-panel-view active" id="admin-view-products">
+      <div class="stats-grid">
+        <div class="stat-box"><div class="num" id="statProducts">0</div><div class="label">المنتجات</div></div>
+        <div class="stat-box green"><div class="num" id="statOrders">0</div><div class="label">الطلبات</div></div>
+        <div class="stat-box purple"><div class="num" id="statRevenue">0</div><div class="label">المبيعات المؤكدة</div></div>
+        <div class="stat-box orange"><div class="num" id="statChats">0</div><div class="label">المحادثات</div></div>
+      </div>
+      <div class="card">
+        <h2>📦 قائمة المنتجات (<span id="productCount">0</span>)</h2>
+        <div class="form-group"><input type="text" id="adminProductSearch" placeholder="🔍 تصفية المنتجات..." oninput="renderProductList()"></div>
+        <div id="productList"><div class="empty">جاري التحميل...</div></div>
+      </div>
+    </div>
+
+    <div class="admin-panel-view" id="admin-view-orders">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+          <h2 style="margin:0;">📋 الطلبات الواردة (<span id="ordersCount">0</span>)</h2>
+          <button type="button" class="btn btn-success btn-sm" onclick="exportOrdersCSV()">📥 تصدير CSV (DHD)</button>
+        </div>
+        <div class="form-group"><input type="text" id="adminOrderSearch" placeholder="🔍 بحث بالاسم، الهاتف، أو الولاية..." oninput="renderOrders()"></div>
+        <div id="ordersList"><div class="empty">جاري التحميل...</div></div>
+      </div>
+    </div>
+
+    <div class="admin-panel-view" id="admin-view-messages">
+      <div class="card">
+        <h2>💬 رسائل العملاء</h2>
+        <div id="adminChatArea" style="display:none; margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+             <h3 id="currentChatName" style="font-size:14px; color:#2563eb; font-weight:800;"></h3>
+             <button type="button" class="btn btn-danger btn-sm" onclick="clearChat()">🗑 مسح</button>
+          </div>
+          <div class="chat-container">
+            <div class="chat-messages" id="adminChatMessages"></div>
+            <div class="chat-input-area">
+              <input type="text" id="adminChatInput" placeholder="اكتب ردك..." onkeypress="if(event.key==='Enter')sendAdminMessage()">
+              <button type="button" onclick="sendAdminMessage()">إرسال</button>
+            </div>
+          </div>
+          <div class="quick-replies">
+            <button type="button" class="quick-btn" onclick="sendQuickReply('أهلاً بك في متجرنا 🌹. كيف يمكنني مساعدتك اليوم؟')">ترحيب</button>
+            <button type="button" class="quick-btn" onclick="sendQuickReply('تم استلام طلبك بنجاح ✅. سنقوم بالتواصل معك قريباً للتأكيد.')">تأكيد طلب</button>
+            <button type="button" class="quick-btn" onclick="sendQuickReply('أعتذر منك، هذا المنتج غير متوفر حالياً. هل تود اقتراح بديل؟')">نفاد مخزون</button>
+            <button type="button" class="quick-btn" onclick="sendQuickReply('شكراً لتواصلك معنا. سنكون معك في أقرب وقت.')">رد عام</button>
+          </div>
+        </div>
+        <h3 style="margin-bottom:12px; font-size:13px; color:#64748b; font-weight:800;">قائمة العملاء:</h3>
+        <div id="adminClientsList" style="display:flex; flex-direction:column; gap:8px;"></div>
+      </div>
+    </div>
+
+    <div class="admin-panel-view" id="admin-view-add">
+      <div class="card">
+        <h2 id="formTitle">➕ إضافة منتج جديد</h2>
+        <form onsubmit="saveProduct(event)">
+          <input type="hidden" id="editId">
+          <div class="form-group"><label>اسم المنتج *</label><input type="text" id="pTitle" required placeholder="مثال: ساعة يد كلاسيكية / ذكية"></div>
+          
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div class="form-group"><label>السعر الأساسي *</label><input type="number" id="pPrice" required min="0" step="0.01" placeholder="مثال: 3200"></div>
+            <div class="form-group"><label>السعر القديم (للتخفيض)</label><input type="number" id="pOldPrice" min="0" step="0.01" placeholder="مثال: 4000"></div>
+          </div>
+          
+          <div class="form-group"><label>الفئة *</label><select id="pCategory" required></select></div>
+          
+          <div class="form-group" style="background:#eff6ff; padding:12px; border-radius:12px; border:1px solid #bfdbfe;">
+            <label style="color:#1e40af;">📏 المقاسات / السعات المتوفرة (افصل بفاصلة ,)</label>
+            <input type="text" id="pSizes" placeholder="مثال: 39, 40, 41 أو 40mm, 44mm">
+            <div style="display:flex; gap:6px; margin-top:4px;">
+              <button type="button" class="preset-btn" onclick="setPresetSizes('shoes')">مقاسات أحذية (39-44)</button>
+              <button type="button" class="preset-btn" onclick="setPresetSizes('clothes')">مقاسات ألبسة (S-XXXL)</button>
+            </div>
+          </div>
+
+          <div class="form-group" style="background:#f0fdf4; padding:12px; border-radius:12px; border:1px solid #bbf7d0;">
+            <label style="color:#166534;">🎨 الألوان / الإصدارات بتخصيص (السعر والصورة اختياري):</label>
+            <p style="font-size:11px; color:#64748b; margin-bottom:6px;">الصيغة: <code>الاسم:السعر:رابط_الصورة</code> (افصل بينها بفواصل)</p>
+            <textarea id="pColors" rows="2" placeholder="أسود:3500:https://img.com/black.jpg, فضي:3800:https://img.com/silver.jpg"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>روابط الصور العامة (افصل بفاصلة ,)</label>
+            <textarea id="pImg" rows="3" placeholder="https://link1.com/img1.jpg, https://link2.com/img2.jpg" oninput="previewImage()"></textarea>
+            <img id="imgPreview" class="image-preview">
+          </div>
+
+          <div class="form-group" style="background:#fff1f2; padding:12px; border-radius:12px; border:1px solid #fecdd3;">
+            <label style="color:#be123c; font-weight:800;">🎬 رابط فيديو المنتج (يظهر كفيديو عائم فوق الصور):</label>
+            <input type="text" id="pVideo" placeholder="مثال: رابط .mp4 أو يوتيوب / شورتس" style="background:white;">
+          </div>
+
+          <div class="form-group"><label>وصف المنتج</label><textarea id="pDesc" rows="3" placeholder="تفاصيل ومواصفات المنتج..."></textarea></div>
+          <button type="submit" class="btn btn-primary" id="saveBtn">💾 حفظ المنتج</button>
+          <button type="button" class="btn btn-warning hidden" id="cancelBtn" style="width:100%;margin-top:8px;" onclick="resetForm()">إلغاء التعديل</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="admin-panel-view" id="admin-view-settings">
+      <div class="card">
+        <h2>⚙️ الإعدادات العامة</h2>
+        <div class="form-group"><label>اسم المتجر</label><input type="text" id="sStoreName"></div>
+        <div class="form-group"><label>شريط الإعلانات العلوي</label><input type="text" id="sPromoBanner" placeholder="🚚 توصيل سريع لـ 58 ولاية..."></div>
+        <div class="form-group"><label>العملة</label><input type="text" id="sCurrency"></div>
+        <div class="form-group"><label>رقم الهاتف / واتساب</label><input type="text" id="sPhone"></div>
+        <div class="form-group"><label>الولايات المحظورة تلقائياً (أرقام الولايات مفصولة بفاصلة)</label><input type="text" id="sBlockedWilayas" placeholder="40"></div>
+        <button type="button" class="btn btn-primary" onclick="saveSettings()">💾 حفظ الإعدادات</button>
+      </div>
+      
+      <div class="card" style="background:#fffbeb; border:1px solid #fde68a;">
+        <h2>🤖 الرد التلقائي</h2>
+        <div class="form-group">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+            <input type="checkbox" id="sAutoReplyEnabled" style="width:18px; height:18px;">
+            <span style="color:#92400e; font-weight:800; font-size:13px;">تفعيل الرد التلقائي</span>
+          </label>
+        </div>
+        <div class="form-group">
+          <label>نص الرد التلقائي</label>
+          <textarea id="sAutoReplyText" rows="2" placeholder="أعتذر منك، المدير مشغول حالياً..."></textarea>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="saveAutoReply()" style="background:#d97706;">💾 حفظ الرد التلقائي</button>
+      </div>
+
+      <div class="card">
+        <h2>🏷️ إدارة الفئات</h2>
+        <div id="categoryList" style="margin-bottom:12px"></div>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="newCategory" placeholder="فئة جديدة" style="flex:1;padding:10px;border:2px solid #e2e8f0;border-radius:10px;font-size:13px;">
+          <button type="button" class="btn btn-success" onclick="addCategory()">➕ إضافة</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast">✓</div>
+<script src="app.js"></script>
+</body>
+</html>

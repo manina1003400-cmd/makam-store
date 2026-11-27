@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f172a">
+<title>MAKAM - اتصل بنا</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="contact">
+<div class="promo-bar" id="promoBanner">🚚 توصيل سريع لـ 58 ولاية • الدفع نقداً عند الاستلام 💯</div>
+<header>
+  <div class="header-top">
+    <div class="logo" id="storeName">🛍️ MAKAM</div>
+    <div class="header-actions">
+      <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" title="تبديل المظهر">🌙</button>
+      <button class="cart-btn" onclick="openCart()">
+        <span class="cart-count" id="cartCount">0</span> 🛒 السلة
+      </button>
+    </div>
+  </div>
+</header>
+<div class="contact-card">
+  <h2>📞 اتصل بنا</h2>
+  <p>خدمة الزبائن متاحة للإجابة عن استفساراتكم</p>
+  <div style="font-size:20px;font-weight:900;direction:ltr;margin-bottom:6px" id="contactNumber"></div>
+  <a class="contact-btn call" id="contactCall" href="#">📞 اتصال هاتفي</a>
+  <a class="contact-btn wa" id="contactWa" href="#" target="_blank">💬 واتساب</a>
+</div>
+<div class="bottom-nav">
+  <a class="nav-item" href="index.html"><span class="icon">🏠</span> الرئيسية </a>
+  <a class="nav-item" href="cart.html"><span class="icon">🛒</span> السلة <span id="bottomCartCount" class="nav-badge">0</span></a>
+  <a class="nav-item" href="orders.html"><span class="icon">📦</span> طلباتي <span id="myOrdersCount" class="nav-badge">0</span></a>
+  <a class="nav-item" href="chat.html"><span class="icon">💬</span> الدردشة </a>
+  <a class="nav-item active" href="contact.html"><span class="icon">📞</span> اتصل بنا </a>
+</div>
+
+<div class="toast" id="toast">✓</div>
+<script src="app.js"></script>
+</body>
+</html>
